@@ -1,6 +1,7 @@
 # Pentago Multiplayer Game
 
-This was done by me and a few friends during out studies like over *10 years ago*.
+This was done by me and a few friends during out studies like over *10 years ago*. It is here primarily for fun and a few giggles.
+
 It is an implemementation of the game pentago as a client-server
 application.
 

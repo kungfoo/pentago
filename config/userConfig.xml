@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+  <configItems>
+    <server>
+      <!-- of the default server -->
+      <port value="8080" />
+      <!-- ip adress or hostname of the default server -->
+      <host value="127.0.0.1" />
+    </server>
+    <client>
+      <color value="white" />
+      <theme value="wood" />
+      <timezone value="Europe/Zurich" />
+      <ownmessagecolor value="87ceeb" />
+      <othermessagecolor value="cccccc" />
+    </client>
+  </configItems>
+  <!-- list of last few logged in users on this host -->
+  <users lastlogin="Max">
+    <user name="kungfoo" />
+    <user name="sidi" />
+    <user name="guetux" />
+    <user name="stefan" />
+  </users>
+</config>
+

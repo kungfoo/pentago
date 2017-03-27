@@ -1,0 +1,19 @@
+<config>
+	<!-- the theme name, also the directory -->
+	<theme name="wood">
+		<name value="REAL wood"/>
+	</theme>
+	<theme name="metal">
+		<!-- description for the theme -->
+		<name value="Brushed Metal"/>
+	</theme>
+	<theme name ="funky">
+		<name value="Funky colors, o'rly"/>
+	</theme>
+	<theme name="red">
+		<name value="Red Devil"/>
+	</theme>
+	<theme name="green">
+		<name value="Green Slime"/>
+	</theme>
+</config>

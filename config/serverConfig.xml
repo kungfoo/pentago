@@ -1,0 +1,34 @@
+<config>
+	<database>
+		<!-- database type, supported right now are {mysql,} -->
+		<host value="localhost"/>
+		<type value="h2"/>
+
+		<!-- h2 needs no ports and all that jazz
+		<name value="pentagosql1"/>
+		<user value="pentagosql1"/>
+		<password value="afsdfsdf"/>
+		<port value="3306"/>
+		-->
+	</database>
+	
+	<server>
+		<name value="dudes go nuts pentago server"/>
+		
+		<!-- port to listen on -->
+		<port value="8080"/>
+		<threads value="66"/>
+		
+		<!-- ip adress to bind to, if you have more than one interface -->
+		<listen value="localhost"/>
+		
+		<!-- geographical location of the server -->
+		<location value="Switzerland, Zuerich"/>
+		
+		<!-- the main language used on this server -->
+		<language value="deutsch"/>
+		
+		<!-- maximum number of users simultaniously logged in -->
+		<maxusers value="33"/>
+	</server>
+</config>

@@ -1,0 +1,241 @@
+<?xml version="1.0"?>
+<!-- ====================================================================== 
+     Apr 11, 2007 8:52:23 AM                                                        
+
+     pentago    
+     multiplayer online game dude
+                   
+     guetux                                                                
+     ====================================================================== -->
+<project name="pentago" default="test">
+    <property name="developers"
+    	value="Stefan Reinhard, Silvio Heuberger, Damian Hofmann, Stefan Sidler">
+	</property>
+	
+	
+	<description>
+    	multiplayer online game
+    </description>
+	
+	<!-- preparational tasks<target name="test" depends="compile-tests">
+  <delete dir="${test.xml.dir}"/>
+  <mkdir dir="${test.xml.dir}"/>
+  <junit errorProperty="test.failed"
+         failureProperty="test.failed">
+    <classpath refid="project.classpath" />
+    <formatter type="brief" usefile="false" />
+    <formatter type="xml" />
+    <batchtest todir="${test.xml.dir}">
+      <fileset dir="${build.test.dir}"
+        includes="**/*Test.class" />
+    </batchtest>
+    <sysproperty key="doc.dir" value="${doc.dir}" />
+    <sysproperty key="index.dir" value="${index.dir}" />
+  </junit>
+  <fail message="Tests failed! Check test reports."
+    if="test.failed" />
+</target>
+	
+	========================================================================-->
+	<!-- Erstellt den Binary-Ordner -->
+	<target name="prepare" depends="clean-bin">
+		<echo message="banane"></echo>
+		<mkdir dir="bin"/>
+	</target>
+	
+	<!-- Löscht alle kompilierten Binaries -->
+	<target name="clean-bin">
+		<delete dir="bin" />
+	</target>
+	
+	<!-- Erstellt den Ordner für die Junit-Test-Reports -->
+	<target name="prepare-report" depends="clean-report">
+		<mkdir dir="report"/>
+		<mkdir dir="report/styles"/>
+	</target>
+	
+	<!-- Löscht den Junit-Test-Report Ordner -->
+	<target name="clean-report">
+		<delete dir="report" />
+	</target>
+	
+	
+	
+	<!-- compilation tasks
+	===================================================================-->
+	<!-- Kompiliert alle Source Files -->
+	<target name="build" depends="prepare">
+		<javac srcdir="src" destdir="bin">
+			<classpath refid="lib.classpath"/>
+		</javac>
+		<javac srcdir="test" destdir="bin">
+			<classpath refid="lib.classpath"/>
+		</javac>
+	</target>
+	
+	<!-- unit testing tasks
+	==================================================================-->
+	<!-- Führt die JUnit Tests aus und generiert einen Report -->
+	<target name="test-report" depends="prepare-report, build, serverjar,clientjar, javadoc, tarbz, sourcetar, osxtar">
+		<junit failureproperty="test.failed">
+			<classpath location="bin" />
+			<batchtest >
+				<formatter type="brief" usefile="off"/>
+				<formatter type="xml" usefile="on"/>
+				<fileset dir="bin" includes="**/*Test.class"></fileset>
+			</batchtest>
+		</junit>
+		
+		<junitreport tofile="report.xml" todir="report">
+			<fileset dir=".">
+				<include name="TEST-*.xml"/>
+			</fileset>
+			<report format="frames" todir="report"/>
+		</junitreport>
+		
+		<delete>
+			<fileset dir="." includes="TEST*"/>
+		</delete>
+		<echo message="You can look at the report at: http://pentago.infosky.ch/junit-report/"></echo>
+	</target>
+	
+	<!-- Führt die JUnit Tests aus ohne Report -->
+	<target name="test" depends="build, serverjar,clientjar, tarbz, sourcetar, osxtar">
+		<junit>
+			<classpath location="bin" />
+			<batchtest >
+				<formatter type="brief" usefile="off"/>
+				<fileset dir="bin" includes="**/*Test.class"></fileset>
+			</batchtest>
+		</junit>
+	</target>
+	
+	
+	<target name="javadoc">
+		<delete dir="javadoc"/>
+		<mkdir dir="javadoc"/>
+		<javadoc destdir="javadoc">
+			<classpath>
+				<fileset dir="lib" includes="**/*.jar"></fileset>
+			</classpath>
+			<fileset dir="src" includes="**/*.java">
+			</fileset>
+		</javadoc>
+	</target>
+	
+	<!-- path definitions
+	====================================================================-->
+	<!-- libraries used to compile -->
+	<fileset dir="./lib" id="lib.fileset">
+			<include name="*.jar"/>
+	</fileset>
+	
+	<path id="lib.classpath">
+		<fileset refid="lib.fileset"></fileset>
+	</path>
+	
+	<!-- jar file tasks
+	========================================================================-->
+	<!-- Erstellt ein FAT FAT FAT JAR File, aye! -->
+	<target name="serverjar" depends="build">
+		<!-- remove old jar file -->
+		<delete file="bin/pentagoServer.jar"/>
+		<delete file="bin/MANIFEST.MF"/>
+			
+		<!-- creates new Manifest file for self executing jar file -->
+		<manifest file="bin/MANIFEST.MF">
+			<attribute name="Built-By" value="${developers}"/>
+			<attribute name="Main-Class" value="ch.pentago.server.ServerMainThread"/>
+		</manifest>
+		
+		<!-- extract libs -->
+		<unjar dest="bin">
+			<fileset dir="lib">
+				<include name="*.jar"/>
+				<exclude name="junit.jar"/>
+			</fileset>
+		</unjar>
+		<!-- build jar file -->
+		<jar destfile="bin/pentagoServer.jar" basedir="bin" excludes="**/*Test.class" includes="**/*" manifest="bin/MANIFEST.MF">
+		</jar>
+		<!-- clean up for online copy -->
+	</target>
+	
+	<target name="clientjar" depends="build">
+			<!-- remove old jar file -->
+			<delete file="bin/pentagoClient.jar"/>
+			<delete file="bin/MANIFEST.MF"/>
+			<!-- remove stuff not needed for client -->
+			<delete>
+				<fileset dir="bin">
+					<include name="**/*"/>
+					<exclude name="ch/**/*"/>
+					<exclude name="pentagoServer.jar"/>
+				</fileset>
+			</delete>
+			<!-- creates new Manifest file for self executing jar file -->
+			<manifest file="bin/MANIFEST.MF">
+				<attribute name="Built-By" value="${developers}"/>
+				<attribute name="Main-Class" value="ch.pentago.ui.MainWindow"/>
+			</manifest>
+			
+			<!-- extract libs -->
+			<unjar dest="bin">
+				<fileset dir="lib">
+					<include name="*.jar"/>
+					<exclude name="junit.jar"/>
+					<exclude name="mysql-connector*"/>
+				</fileset>
+			</unjar>
+			<!-- build jar file -->
+			<jar destfile="bin/pentagoClient.jar" basedir="bin" excludes="**/*Test.class" includes="**/*" manifest="bin/MANIFEST.MF">
+			</jar>
+			<!-- clean up for online copy -->
+	</target>
+	
+	<!-- builds the os X release of the client -->
+	<target name="osxtar">
+		<copy todir="pentago.app/Contents/Resources/Java" overwrite="true">
+			<fileset dir="bin">
+				<include name="pentagoClient.jar"/>
+			</fileset>
+			<fileset dir=".">
+				<include name="themes/**/*.*"/>
+				<include name="config/userConfig.xml"/>
+			</fileset>
+		</copy>
+		<tar destfile="pentago-osx.tar.bz2" compression="bzip2" basedir=".">
+			<include name="pentago.app/**/*"/>
+		</tar>
+	</target>
+	
+	<target name="tarbz" depends="clientjar">
+		<tar basedir="../pentago/" destfile="pentago-client.tar.bz2" compression="bzip2">
+			<include name="bin/pentagoClient.jar"/>
+			<include name="themes/**/*"/>
+			<include name="pentago.sh"/>
+			<include name="pentago.bat"/>
+			<include name="config/user*"/>
+			<exclude name="config/server*"/>
+			<exclude name="bin/**/server/**/*.class"/>
+		</tar>
+		<zip basedir="../pentago/" destfile="pentago-client.zip">
+			<include name="bin/pentagoClient.jar"/>
+			<include name="themes/**/*"/>
+			<include name="pentago.sh"/>
+			<include name="pentago.bat"/>
+			<include name="config/user*"/>
+			<exclude name="config/server*"/>
+			<exclude name="bin/**/server/**/*.class"/>
+		</zip>
+	</target>
+	
+	<target name="sourcetar" depends="">
+		<tar basedir="." destfile="pentago-source.tar.bz2" compression="bzip2">
+			<include name="src/**/*.java"/>
+		</tar>
+		<zip basedir="." destfile="pentago-source.zip">
+			<include name="src/**/*.java"/>
+		</zip>
+	</target>
+</project>
